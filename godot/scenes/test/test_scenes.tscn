@@ -1,42 +1,59 @@
-[gd_scene load_steps=5 format=3 uid="uid://di8abw6lgn757"]
+[gd_scene load_steps=11 format=3 uid="uid://di8abw6lgn757"]
 
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_g6edg"]
-sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
-ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+[ext_resource type="Texture2D" uid="uid://dmj187ablpi0t" path="res://assets/hdris/sunflowers_puresky_1k.exr" id="1_ag3hh"]
+[ext_resource type="Texture2D" uid="uid://o3vueooh5gv2" path="res://assets/kenney_prototype-textures/PNG/Dark/texture_07.png" id="1_om4h1"]
+[ext_resource type="PackedScene" uid="uid://dtbbxwf2ut206" path="res://scenes/player/player.tscn" id="3_taa7x"]
+[ext_resource type="Script" path="res://scenes/player/player.gd" id="4_wbria"]
 
-[sub_resource type="Sky" id="Sky_lh2i5"]
-sky_material = SubResource("ProceduralSkyMaterial_g6edg")
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_j5n5g"]
+albedo_texture = ExtResource("1_om4h1")
+uv1_triplanar = true
+
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_wylee"]
+panorama = ExtResource("1_ag3hh")
+
+[sub_resource type="Sky" id="Sky_wshx7"]
+sky_material = SubResource("PanoramaSkyMaterial_wylee")
 
 [sub_resource type="Environment" id="Environment_va7nk"]
 background_mode = 2
-sky = SubResource("Sky_lh2i5")
+sky = SubResource("Sky_wshx7")
 tonemap_mode = 2
 glow_enabled = true
+
+[sub_resource type="SphereMesh" id="SphereMesh_qic3r"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_tsddh"]
 
 [node name="TestScenes" type="Node3D"]
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_va7nk")
+[node name="stage" type="Node3D" parent="."]
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(-0.866023, -0.433016, 0.250001, 0, 0.499998, 0.866027, -0.500003, 0.749999, -0.43301, 0, 0, 0)
-shadow_enabled = true
-
-[node name="Ground" type="CSGBox3D" parent="."]
+[node name="Ground" type="CSGBox3D" parent="stage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+material_override = SubResource("StandardMaterial3D_j5n5g")
 use_collision = true
 size = Vector3(20, 1, 20)
 
-[node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(0.675352, 0.304049, -0.671903, 0, 0.911061, 0.412273, 0.737496, -0.278429, 0.615286, -12.5225, 7.68369, 11.4673)
+[node name="env" type="Node3D" parent="."]
 
-[node name="RigidBody3D" type="RigidBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.76718, 0)
+[node name="WorldEnvironment" type="WorldEnvironment" parent="env"]
+environment = SubResource("Environment_va7nk")
 
-[node name="CSGSphere3D" type="CSGSphere3D" parent="RigidBody3D"]
-radial_segments = 24
-rings = 12
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="env"]
+transform = Transform3D(-0.88789, -0.198217, -0.415164, -0.0452821, -0.860386, 0.507627, -0.457821, 0.469517, 0.754953, 0, 0, 0)
+light_color = Color(0.898039, 0.909804, 0.882353, 1)
+shadow_enabled = true
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D"]
+[node name="Ball" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2.92898, 2)
+
+[node name="meshspeher" type="MeshInstance3D" parent="Ball"]
+mesh = SubResource("SphereMesh_qic3r")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ball"]
 shape = SubResource("SphereShape3D_tsddh")
+
+[node name="Player" parent="." instance=ExtResource("3_taa7x")]
+script = ExtResource("4_wbria")
+acceleration_speed = 8.0
